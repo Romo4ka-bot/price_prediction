@@ -41,3 +41,5 @@ data_cfg.task = cfg.task
 cfg.model_cfg = model_cfg
 cfg.data_cfg = data_cfg
 
+cfg.model = 'TablePredictor'
+
