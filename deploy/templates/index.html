@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real Estate Price Predictor</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div id="app">
+        <!-- Навигация -->
+        <nav class="navbar">
+            <div class="nav-brand">
+                <i class="fas fa-home"></i>
+                <span>RealEstate AI</span>
+            </div>
+            <div class="nav-links" id="navLinks">
+                <a href="#predict" class="nav-link active" data-section="predict">
+                    <i class="fas fa-calculator"></i> Предсказание
+                </a>
+                <a href="#history" class="nav-link" data-section="history">
+                    <i class="fas fa-history"></i> История
+                </a>
+                <a href="#stats" class="nav-link" data-section="stats">
+                    <i class="fas fa-chart-bar"></i> Статистика
+                </a>
+            </div>
+            <div class="nav-auth" id="navAuth">
+                <button class="btn btn-outline" onclick="showAuthModal('login')">
+                    <i class="fas fa-sign-in-alt"></i> Войти
+                </button>
+            </div>
+            <div class="nav-user hidden" id="navUser">
+                <span id="username"></span>
+                <button class="btn btn-outline" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
+            </div>
+        </nav>
+
+        <!-- Основной контент -->
+        <main class="main-content">
+            <!-- Секция предсказания -->
+            <section id="predict" class="section active">
+                <div class="container">
+                    <div class="section-header">
+                        <h1><i class="fas fa-magic"></i> Предсказание стоимости</h1>
+                        <p>Введите характеристики недвижимости для получения прогноза цены</p>
+                    </div>
+
+                    <div class="grid grid-2">
+                        <!-- Форма ввода -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h3><i class="fas fa-edit"></i> Характеристики</h3>
+                            </div>
+                            <div class="card-body">
+                                <form id="predictionForm" class="form">
+                                    <div id="formFields">
+                                        <!-- Поля генерируются динамически из конфига -->
+                                    </div>
+                                    <button type="submit" class="btn btn-primary btn-block">
+                                        <i class="fas fa-calculator"></i> Рассчитать стоимость
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+
+                        <!-- Результат -->
+                        <div class="card result-card hidden" id="resultCard">
+                            <div class="card-header">
+                                <h3><i class="fas fa-check-circle"></i> Результат</h3>
+                            </div>
+                            <div class="card-body">
+                                <div class="price-display">
+                                    <div class="price-label">Прогнозируемая стоимость</div>
+                                    <div class="price-value" id="predictedPrice">-</div>
+                                    <div class="price-range" id="priceRange">-</div>
+                                </div>
+                                
+                                <div class="confidence-info">
+                                    <div class="confidence-item">
+                                        <span class="confidence-label">Уровень доверия:</span>
+                                        <span class="confidence-value" id="confidence">-</span>
+                                    </div>
+                                    <div class="confidence-item">
+                                        <span class="confidence-label">Погрешность:</span>
+                                        <span class="confidence-value" id="errorMargin">-</span>
+                                    </div>
+                                </div>
+
+                                <div class="chart-container">
+                                    <canvas id="priceChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Секция истории -->
+            <section id="history" class="section">
+                <div class="container">
+                    <div class="section-header">
+                        <h1><i class="fas fa-history"></i> История запросов</h1>
+                        <p>Просмотр и управление вашими предсказаниями</p>
+                    </div>
+
+                    <!-- Фильтры -->
+                    <div class="card filters-card">
+                        <div class="card-body">
+                            <div class="filters">
+                                <div class="filter-group">
+                                    <label>Период с:</label>
+                                    <input type="date" id="filterDateFrom" class="form-control">
+                                </div>
+                                <div class="filter-group">
+                                    <label>по:</label>
+                                    <input type="date" id="filterDateTo" class="form-control">
+                                </div>
+                                <div class="filter-group">
+                                    <label>Район:</label>
+                                    <select id="filterDistrict" class="form-control">
+                                        <option value="">Все</option>
+                                    </select>
+                                </div>
+                                <div class="filter-group">
+                                    <label>Комнат:</label>
+                                    <select id="filterRooms" class="form-control">
+                                        <option value="">Все</option>
+                                        <option value="1">1</option>
+                                        <option value="2">2</option>
+                                        <option value="3">3</option>
+                                        <option value="4">4+</option>
+                                    </select>
+                                </div>
+                                <div class="filter-group">
+                                    <label>Цена от:</label>
+                                    <input type="number" id="filterMinPrice" class="form-control" placeholder="₽">
+                                </div>
+                                <div class="filter-group">
+                                    <label>до:</label>
+                                    <input type="number" id="filterMaxPrice" class="form-control" placeholder="₽">
+                                </div>
+                                <button class="btn btn-primary" onclick="applyFilters()">
+                                    <i class="fas fa-filter"></i> Применить
+                                </button>
+                                <button class="btn btn-outline" onclick="resetFilters()">
+                                    <i class="fas fa-undo"></i> Сбросить
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Таблица истории -->
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table" id="historyTable">
+                                    <thead>
+                                        <tr>
+                                            <th>Дата</th>
+                                            <th>Район</th>
+                                            <th>Площадь</th>
+                                            <th>Комнат</th>
+                                            <th>Цена</th>
+                                            <th>Диапазон</th>
+                                            <th>Действия</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="historyTableBody">
+                                        <!-- Данные загружаются динамически -->
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="empty-state hidden" id="emptyState">
+                                <i class="fas fa-inbox"></i>
+                                <p>История предсказаний пуста</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Секция статистики -->
+            <section id="stats" class="section">
+                <div class="container">
+                    <div class="section-header">
+                        <h1><i class="fas fa-chart-bar"></i> Статистика</h1>
+                        <p>Аналитика по вашим предсказаниям</p>
+                    </div>
+
+                    <div class="stats-grid" id="statsGrid">
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-calculator"></i>
+                            </div>
+                            <div class="stat-value" id="statTotal">0</div>
+                            <div class="stat-label">Всего предсказаний</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-ruble-sign"></i>
+                            </div>
+                            <div class="stat-value" id="statAvg">0</div>
+                            <div class="stat-label">Средняя цена</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-arrow-down"></i>
+                            </div>
+                            <div class="stat-value" id="statMin">0</div>
+                            <div class="stat-label">Минимальная цена</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-arrow-up"></i>
+                            </div>
+                            <div class="stat-value" id="statMax">0</div>
+                            <div class="stat-label">Максимальная цена</div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-2">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3><i class="fas fa-map-marker-alt"></i> По районам</h3>
+                            </div>
+                            <div class="card-body">
+                                <div class="chart-container">
+                                    <canvas id="districtChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-header">
+                                <h3><i class="fas fa-bed"></i> По комнатам</h3>
+                            </div>
+                            <div class="card-body">
+                                <div class="chart-container">
+                                    <canvas id="roomsChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Модальное окно аутентификации -->
+        <div class="modal hidden" id="authModal">
+            <div class="modal-overlay" onclick="closeAuthModal()"></div>
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 id="authTitle">Вход</h3>
+                    <button class="modal-close" onclick="closeAuthModal()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="authForm">
+                        <div class="form-group" id="emailGroup" style="display: none;">
+                            <label>Email</label>
+                            <input type="email" id="authEmail" class="form-control" placeholder="your@email.com">
+                        </div>
+                        <div class="form-group">
+                            <label>Имя пользователя</label>
+                            <input type="text" id="authUsername" class="form-control" placeholder="username" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Пароль</label>
+                            <input type="password" id="authPassword" class="form-control" placeholder="••••••" required>
+                        </div>
+                        <div id="authError" class="alert alert-danger hidden"></div>
+                        <button type="submit" class="btn btn-primary btn-block">
+                            <i class="fas fa-sign-in-alt"></i> <span id="authSubmitText">Войти</span>
+                        </button>
+                    </form>
+                    <div class="auth-switch">
+                        <span id="authSwitchText">Нет аккаунта?</span>
+                        <button class="btn btn-link" id="authSwitchBtn" onclick="switchAuthMode()">Зарегистрироваться</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Модальное окно редактирования -->
+        <div class="modal hidden" id="editModal">
+            <div class="modal-overlay" onclick="closeEditModal()"></div>
+            <div class="modal-content modal-lg">
+                <div class="modal-header">
+                    <h3><i class="fas fa-edit"></i> Редактирование</h3>
+                    <button class="modal-close" onclick="closeEditModal()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="editForm">
+                        <input type="hidden" id="editId">
+                        <div id="editFormFields">
+                            <!-- Поля генерируются динамически -->
+                        </div>
+                        <div class="modal-actions">
+                            <button type="button" class="btn btn-outline" onclick="closeEditModal()">Отмена</button>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Сохранить
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Toast уведомления -->
+        <div id="toastContainer"></div>
+    </div>
+
+    <!-- Скрипты -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="/static/js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,16 @@
+torch==2.9.1
+scikit-learn==1.6.1
+pandas==2.3.3
+dill==0.4.0
+accelerate==1.12.0
+easydict==1.13
+catboost==1.2.8
+
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+sqlalchemy==2.0.23
+pydantic==2.5.0
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+bcrypt==4.0.1
+python-multipart==0.0.6
