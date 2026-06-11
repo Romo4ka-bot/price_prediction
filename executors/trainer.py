@@ -47,7 +47,7 @@ class Trainer:
 
         kwargs = {'batch_size': self.cfg.batch_size}
         if torch.cuda.is_available():
-            kwargs['num_workers'] = 2
+            kwargs['num_workers'] = 0
             kwargs['pin_memory'] = True
         self.train_dataloader = DataLoader(self.train_data, shuffle=True, **kwargs)
         self.val_dataloader = DataLoader(self.valid_data, shuffle=False, **kwargs)
@@ -251,7 +251,7 @@ class Trainer:
     def test(self):
         kwargs = {'batch_size': self.cfg.batch_size}
         if torch.cuda.is_available():
-            kwargs['num_workers'] = 2
+            kwargs['num_workers'] = 0
             kwargs['pin_memory'] = True
         dataloader = DataLoader(
             ApartmentDataset("test", **self.cfg.data_cfg),
@@ -284,19 +284,19 @@ class Trainer:
 
 if __name__ == "__main__":
     from configs.train_cfg import cfg
-    from utils.project_paths import get_transformer_artifact_dir, load_tablepredictor_cfg
-
-    # cfg.accelerator_args['mps'] = True
-    cfg.batch_size = 16
-    cfg.model = 'TablePredictor'
-    path = get_transformer_artifact_dir()
-    cfg.model_cfg = load_tablepredictor_cfg(path)
+    # from utils.project_paths import get_transformer_artifact_dir, load_tablepredictor_cfg
+    #
+    # # cfg.accelerator_args['mps'] = True
+    # cfg.batch_size = 16
+    # cfg.model = 'TablePredictor'
+    # path = get_transformer_artifact_dir()
+    # cfg.model_cfg = load_tablepredictor_cfg(path)
+    #
+    # trainer = Trainer(cfg)
+    # trainer.load_model(os.path.join(path, 'TablePredictor.pt'))
+    #
+    # print(trainer.test())
 
     trainer = Trainer(cfg)
-    trainer.load_model(os.path.join(path, 'TablePredictor.pt'))
-
-    print(trainer.test())
-
-    # trainer = Trainer(cfg)
     # trainer.save_model('./test.pt')
-    # trainer.fit()
+    trainer.fit()
