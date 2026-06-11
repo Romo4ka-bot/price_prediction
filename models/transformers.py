@@ -29,7 +29,7 @@ class Transformer(nn.Module):
                  add_cls_token: bool,
                  mask_first_token: bool,
                  kv_compression: str = None,
-                 kv_compression_dim: int = None,
+                 kv_compression_ratio: float = None,
                  ) -> None:
         super().__init__()
         self.add_cls_token = add_cls_token
@@ -37,7 +37,7 @@ class Transformer(nn.Module):
                                       dropout, add_cls_token)
         self.seq_len = self.embed.seq_len
 
-        self.kv_compression_dim = kv_compression_dim
+        self.kv_compression_dim = max(1, int(kv_compression_ratio * self.seq_len))
 
         self.kv_compressors = nn.ModuleList([
             nn.ModuleList([self._get_compressor(), self._get_compressor()])
@@ -89,12 +89,12 @@ class TablePredictor(Transformer):
                  add_cls_token: bool,
                  mask_first_token: bool,
                  kv_compression: str = None,
-                 kv_compression_dim: int = None,
+                 kv_compression_ratio: float = None,
                  ) -> None:
         super().__init__(embed_dim, num_embed_features, num_q_heads, num_kv_heads, attn_dropout,
                          mlp_dropout, dropout, act, mlp_dim_factor, num_blocks, attn, mlp, norm,
                          pool, pred_dim, add_cls_token, mask_first_token, kv_compression,
-                         kv_compression_dim)
+                         kv_compression_ratio)
         self.pool = pool
         self.mask_first_token = mask_first_token
         if mask_first_token:
