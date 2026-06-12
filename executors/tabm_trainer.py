@@ -266,41 +266,41 @@ class TabmTrainer:
 
 if __name__ == "__main__":
     from configs.train_cfg import cfg
-    from utils.project_paths import get_tabm_artifact_dir
-
-    cfg.batch_size = 16
-    path = get_tabm_artifact_dir()
-    with open(os.path.join(path, 'logs', 'config.json'), 'r') as f:
-        cfg.model_cfg = json.load(f)['model_cfg']
-
-    trainer = TabmTrainer(cfg)
-    trainer.load_model(os.path.join(path, 'TabM.pt'))
-
-    print(trainer.test())
-
-    # cfg.num_epoch = 200
-    # cfg.weight_decay = 3e-4
-    # cfg.lr = 2e-3
-    # cfg.model = 'TabM'
-    # cfg.batch_size = 64
+    # from utils.project_paths import get_tabm_artifact_dir
     #
-    # cfg.loss = 'MSELoss'
-    #
-    # cfg.model_cfg = EasyDict(
-    #     cat_cardinalities=cfg.model_cfg.num_embed_features,
-    #     d_out=1,
-    #     # arch_type='tabm-mini'
-    #     # d_in,
-    #     # n_blocks,
-    #     # d_block,
-    #     # dropout=0.1,
-    #     # activation='ReLU',
-    #     # k=32
-    # )
+    # cfg.batch_size = 16
+    # path = get_tabm_artifact_dir()
+    # with open(os.path.join(path, 'logs', 'config.json'), 'r') as f:
+    #     cfg.model_cfg = json.load(f)['model_cfg']
     #
     # trainer = TabmTrainer(cfg)
-    # # trainer.overfitting_on_batch()
-    # trainer.fit()
+    # trainer.load_model(os.path.join(path, 'TabM.pt'))
+    #
+    # print(trainer.test())
+
+    cfg.num_epoch = 200
+    cfg.weight_decay = 3e-4
+    cfg.lr = 2e-3
+    cfg.model = 'TabM'
+    cfg.batch_size = 64
+
+    cfg.loss = 'MSELoss'
+
+    cfg.model_cfg = EasyDict(
+        cat_cardinalities=cfg.model_cfg.num_embed_features,
+        d_out=1,
+        # arch_type='tabm-mini'
+        # d_in,
+        # n_blocks,
+        # d_block,
+        # dropout=0.1,
+        # activation='ReLU',
+        # k=32
+    )
+
+    trainer = TabmTrainer(cfg)
+    # trainer.overfitting_on_batch()
+    trainer.fit()
 
 
 """

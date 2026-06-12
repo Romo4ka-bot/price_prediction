@@ -5,7 +5,6 @@ import torch.nn as nn
 
 import models.modules.attention as attn_obj
 import models.modules.mlp as mlp_obj
-import models.modules.compressor as compressor_obj
 
 
 class TransformerBlock(nn.Module):

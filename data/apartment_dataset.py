@@ -91,10 +91,9 @@ class ApartmentDataset(Dataset):
 
 
 if __name__ == '__main__':
-    from configs.pretrain_cfg import cfg
     from executors.trainer import Trainer
-
-    trainer = Trainer(cfg)
-    print(trainer.train_data[0]['mask'])
-    print(trainer.train_data[0]['mask'])
-    print(trainer.train_data[0]['mask'])
+    #
+    # trainer = Trainer(cfg)
+    # print(trainer.train_data[0]['mask'])
+    # print(trainer.train_data[0]['mask'])
+    # print(trainer.train_data[0]['mask'])
